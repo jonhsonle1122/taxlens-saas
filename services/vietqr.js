@@ -88,9 +88,9 @@ function createPaymentOrder(planId, clientEmail = 'user@example.com') {
   }
 
   const orderId = 'TL' + Math.floor(100000 + Math.random() * 900000);
-  const bankId = process.env.VIETQR_BANK_ID || 'MB';
-  const accountNo = process.env.VIETQR_ACCOUNT_NO || '0988776655';
-  const accountName = process.env.VIETQR_ACCOUNT_NAME || 'NGUYEN THANH - TAXLENS AI';
+  const bankId = process.env.VIETQR_BANK_ID || 'ICB';
+  const accountNo = process.env.VIETQR_ACCOUNT_NO || '0918498439';
+  const accountName = process.env.VIETQR_ACCOUNT_NAME || 'NGUYEN THANH';
 
   const memo = `${orderId}`;
   const encodedMemo = encodeURIComponent(memo);
