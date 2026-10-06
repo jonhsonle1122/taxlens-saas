@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaxLens AI - Quản Trị Doanh Thu & Rút Tiền (Admin Portal)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-gate-card {
+      max-width: 440px;
+      margin: 100px auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-bottom-right"></div>
+
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+          <div class="brand-icon">🛡️</div>
+          <div class="brand-text">
+            <span class="brand-name">TaxLens <span class="gradient-text">Admin</span></span>
+            <span class="brand-badge">Cổng Quản Trị Doanh Thu & Settlement</span>
+          </div>
+        </a>
+      </div>
+      <div>
+        <a href="/" class="btn btn-secondary btn-sm">← Về Trang Khách Hàng</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Password Gate (Phải nhập Admin Key để mở) -->
+    <div class="panel-card admin-gate-card" id="adminGate">
+      <div class="panel-header" style="justify-content: center;">
+        <h3>🔒 Xác Thực Quyền Chủ Sở Hữu</h3>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
+        Vui lòng nhập Admin Secret Key để xem doanh thu và thực hiện rút tiền về ví cá nhân.
+      </p>
+      <div class="form-group">
+        <input type="password" id="inputAdminGateKey" placeholder="Nhập admin key bí mật..." value="taxlens-admin-sec-2026">
+      </div>
+      <button class="btn btn-primary btn-block" id="btnUnlockAdmin">Mở Khóa Quản Trị</button>
+      <div id="gateErrorMsg" style="color: var(--danger); font-size: 0.85rem; margin-top: 10px;" class="hidden"></div>
+    </div>
+
+    <!-- Protected Admin Dashboard -->
+    <div class="admin-container hidden" id="adminDashboard">
+      <div class="admin-header">
+        <div class="badge badge-purple" style="margin-bottom: 8px;">Creator Settlement Portal</div>
+        <h2>Báo Cáo Doanh Thu & Thu Tiền Về Ví</h2>
+        <p>Theo dõi tổng số dư từ khách hàng nạp VietQR và bot thanh toán x402 Base L2, thực hiện lệnh rút tiền về ví cá nhân.</p>
+      </div>
+
+      <div class="stats-overview-grid">
+        <div class="stat-card">
+          <span class="stat-title">Số Dư USDC Khả Dụng (Base L2)</span>
+          <div class="stat-number font-mono text-cyan" id="adminUsdcBalance">0.0000 USDC</div>
+          <span class="stat-sub" id="adminUsdcAddress">Ví Agent: Đang tải...</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-title">Doanh Thu VietQR Đã Thu (VND)</span>
+          <div class="stat-number font-mono text-emerald" id="adminVndBalance">0 ₫</div>
+          <span class="stat-sub">Tài khoản Napas 24/7 MBBank</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-title">Tổng Lượt Gọi API Đã Phục Vụ</span>
+          <div class="stat-number font-mono text-purple" id="adminTotalRequests">0 lượt</div>
+          <span class="stat-sub" id="adminPaidRequests">0 x402 • 0 VietQR</span>
+        </div>
+      </div>
+
+      <!-- Withdrawal Form Card -->
+      <div class="panel-card withdraw-panel">
+        <div class="panel-header">
+          <h3>Lệnh Rút Doanh Thu Về Ví Cá Nhân (Payout)</h3>
+          <span class="badge badge-success">Zero Fee</span>
+        </div>
+        <div class="withdraw-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="withdrawTargetAddress">Địa chỉ ví nhận tiền trên mạng Base (0x...):</label>
+              <input type="text" id="withdrawTargetAddress" placeholder="0xYourPersonalBaseWalletAddress..." value="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">
+            </div>
+            <div class="form-group">
+              <label for="withdrawAmount">Số tiền rút (USDC):</label>
+              <input type="number" step="0.001" id="withdrawAmount" placeholder="0.05" value="0.005">
+            </div>
+            <div class="form-group">
+              <label for="withdrawAdminKey">Mã bí mật Admin (Security Key):</label>
+              <input type="password" id="withdrawAdminKey" placeholder="taxlens-admin-sec-2026" value="taxlens-admin-sec-2026">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnExecuteWithdraw">Xác Nhận Rút USDC Về Ví</button>
+          <div class="withdraw-feedback hidden" id="withdrawFeedback"></div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions Log -->
+      <div class="panel-card transactions-panel">
+        <div class="panel-header">
+          <h3>Lịch Sử Dòng Tiền & Giao Dịch</h3>
+          <button class="btn btn-outline btn-xs" id="btnRefreshTx">Làm mới</button>
+        </div>
+        <div class="table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Thời gian</th>
+                <th>Loại</th>
+                <th>Số tiền</th>
+                <th>Cổng thanh toán</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTbody">
+              <tr><td colspan="5" class="text-center">Đang tải lịch sử giao dịch...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentAdminKey = '';
+
+    document.getElementById('btnUnlockAdmin').addEventListener('click', async () => {
+      const key = document.getElementById('inputAdminGateKey').value.trim();
+      const err = document.getElementById('gateErrorMsg');
+      
+      // Kiểm tra sơ bộ
+      if (!key) {
+        err.innerText = 'Vui lòng nhập Admin Key.';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      currentAdminKey = key;
+      document.getElementById('adminGate').classList.add('hidden');
+      document.getElementById('adminDashboard').classList.remove('hidden');
+      document.getElementById('withdrawAdminKey').value = key;
+
+      await loadAdminData();
+    });
+
+    async function loadAdminData() {
+      try {
+        const resWallet = await fetch('/api/wallet');
+        const dWallet = await resWallet.json();
+        if (dWallet.status === 'success') {
+          const w = dWallet.wallet;
+          document.getElementById('adminUsdcBalance').innerText = `${w.availableBalanceUSDC.toFixed(4)} USDC`;
+          document.getElementById('adminVndBalance').innerText = `${w.totalEarnedVND.toLocaleString('vi-VN')} ₫`;
+          document.getElementById('adminTotalRequests').innerText = `${w.totalRequests} lượt`;
+          document.getElementById('adminPaidRequests').innerText = `${w.paidRequestsX402} x402 • ${w.paidRequestsVietQR} VietQR`;
+          document.getElementById('adminUsdcAddress').innerText = `Ví Agent: ${w.address.substring(0, 10)}...${w.address.substring(34)}`;
+        }
+
+        const resTx = await fetch('/api/admin/transactions');
+        const dTx = await resTx.json();
+        if (dTx.status === 'success') {
+          const tbody = document.getElementById('transactionsTbody');
+          if (dTx.transactions.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-dim">Chưa có giao dịch phát sinh.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = '';
+          dTx.transactions.forEach(tx => {
+            const tr = document.createElement('tr');
+            const formattedDate = new Date(tx.timestamp).toLocaleTimeString('vi-VN') + ' ' + new Date(tx.timestamp).toLocaleDateString('vi-VN');
+            const amountDisplay = tx.currency === 'USDC' ? `+${tx.amount} USDC` : `+${tx.amount.toLocaleString('vi-VN')} ₫`;
+            tr.innerHTML = `
+              <td>${formattedDate}</td>
+              <td><span class="badge ${tx.type.includes('WITHDRAW') ? 'badge-danger' : 'badge-success'}">${tx.type}</span></td>
+              <td class="font-mono ${tx.currency === 'USDC' ? 'text-cyan' : 'text-emerald'}">${amountDisplay}</td>
+              <td>${tx.network || 'Base L2'}</td>
+              <td class="font-mono text-xs text-dim">${tx.proof ? tx.proof.substring(0, 16) + '...' : (tx.orderId || 'Direct')}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    document.getElementById('btnRefreshTx').addEventListener('click', loadAdminData);
+
+    document.getElementById('btnExecuteWithdraw').addEventListener('click', async () => {
+      const targetAddress = document.getElementById('withdrawTargetAddress').value.trim();
+      const amountUSDC = parseFloat(document.getElementById('withdrawAmount').value);
+      const adminKey = document.getElementById('withdrawAdminKey').value.trim();
+      const feedback = document.getElementById('withdrawFeedback');
+      const btn = document.getElementById('btnExecuteWithdraw');
+
+      if (!targetAddress || !amountUSDC || !adminKey) {
+        alert('Vui lòng điền đủ địa chỉ ví, số tiền và mã bí mật Admin.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Đang Rút Tiền On-Chain...';
+
+      try {
+        const res = await fetch('/api/admin/withdraw', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetAddress, amountUSDC, adminKey })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        feedback.className = 'withdraw-feedback success';
+        feedback.classList.remove('hidden');
+        feedback.innerHTML = `
+          ✓ <strong>Rút thành công ${data.payout.withdrawnAmount} USDC!</strong><br>
+          Tx Hash: <a href="${data.payout.explorerUrl}" target="_blank" class="link-glow font-mono">${data.payout.payoutTxHash}</a><br>
+          Số dư khả dụng còn lại: ${data.payout.remainingBalance.toFixed(4)} USDC
+        `;
+
+        await loadAdminData();
+      } catch (err) {
+        feedback.className = 'withdraw-feedback error';
+        feedback.classList.remove('hidden');
+        feedback.innerText = '✕ Thất bại: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Xác Nhận Rút USDC Về Ví';
+      }
+    });
+  </script>
+</body>
+</html>

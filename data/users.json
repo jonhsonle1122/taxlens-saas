@@ -3,7 +3,7 @@
     "apiKey": "demo-free-key-guest",
     "name": "Khách hàng dùng thử",
     "plan": "Trial",
-    "credits": 0,
+    "credits": 2,
     "createdAt": "2026-10-06T03:13:55.267Z"
   },
   "taxlens_84w6o1mfdz_muw3u32n": {
@@ -29,5 +29,13 @@
     "credits": 50,
     "totalPurchased": 50,
     "activatedAt": "2026-10-06T03:22:17.414Z"
+  },
+  "taxlens_67lm0q27jm_muw522so": {
+    "apiKey": "taxlens_67lm0q27jm_muw522so",
+    "orderId": "TL150136",
+    "plan": "Gói Khởi Động (Starter)",
+    "credits": 50,
+    "totalPurchased": 50,
+    "activatedAt": "2026-10-06T03:48:12.840Z"
   }
 }

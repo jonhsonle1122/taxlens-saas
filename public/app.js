@@ -30,10 +30,6 @@ function initTabs() {
       btn.classList.add('active');
       const targetContent = document.getElementById(targetId);
       if (targetContent) targetContent.classList.add('active');
-
-      if (targetId === 'admin-tab') {
-        fetchAdminData();
-      }
     });
   });
 }
@@ -121,13 +117,10 @@ function setupEventListeners() {
     document.getElementById('tabInvoiceBtn').click();
   });
 
-  // x402 Simulator Buttons
-  document.getElementById('btnSimulate402')?.addEventListener('click', handleSimulate402Challenge);
-  document.getElementById('btnSimulatePaymentProof')?.addEventListener('click', handleSimulatePaymentProof);
-
-  // Admin Withdraw
-  document.getElementById('btnExecuteWithdraw')?.addEventListener('click', handleWithdraw);
-  document.getElementById('btnRefreshTx')?.addEventListener('click', fetchAdminData);
+  // Header topup shortcut
+  document.getElementById('headerTopupBtn')?.addEventListener('click', () => {
+    document.getElementById('tabPricingBtn')?.click();
+  });
 }
 
 // 4. Handle Invoice Extraction
@@ -441,30 +434,9 @@ async function handleSimulatePaymentProof() {
   }
 }
 
-// 9. Wallet & Admin Data
+// 9. Wallet & User Quota Data
 async function fetchWalletMetrics() {
-  try {
-    const res = await fetch('/api/wallet');
-    const data = await res.json();
-    if (data.status === 'success') {
-      const w = data.wallet;
-      document.getElementById('headerUsdcBalance').innerText = `${w.availableBalanceUSDC.toFixed(4)} USDC`;
-      document.getElementById('headerVndBalance').innerText = `${w.totalEarnedVND.toLocaleString('vi-VN')} ₫`;
-
-      const adminUsdc = document.getElementById('adminUsdcBalance');
-      if (adminUsdc) adminUsdc.innerText = `${w.availableBalanceUSDC.toFixed(4)} USDC`;
-      const adminVnd = document.getElementById('adminVndBalance');
-      if (adminVnd) adminVnd.innerText = `${w.totalEarnedVND.toLocaleString('vi-VN')} ₫`;
-      const adminReqs = document.getElementById('adminTotalRequests');
-      if (adminReqs) adminReqs.innerText = `${w.totalRequests} lượt`;
-      const adminPaid = document.getElementById('adminPaidRequests');
-      if (adminPaid) adminPaid.innerText = `${w.paidRequestsX402} x402 • ${w.paidRequestsVietQR} VietQR`;
-      const adminAddr = document.getElementById('adminUsdcAddress');
-      if (adminAddr) adminAddr.innerText = `Ví Agent: ${w.address.substring(0, 8)}...${w.address.substring(36)}`;
-    }
-  } catch (err) {
-    console.error('Không thể cập nhật số dư:', err);
-  }
+  // Không hiển thị số dư chủ sở hữu trên giao diện khách hàng
 }
 
 async function checkUserCredits() {
@@ -478,6 +450,9 @@ async function checkUserCredits() {
       const credits = data.user.credits;
       const display = document.getElementById('creditsCountDisplay');
       if (display) display.innerText = `${credits} lượt`;
+
+      const headerDisplay = document.getElementById('headerUserCreditsDisplay');
+      if (headerDisplay) headerDisplay.innerText = `${credits} lượt`;
     }
   } catch (e) {}
 }

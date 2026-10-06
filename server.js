@@ -20,6 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 // Serve frontend static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Protected Admin Portal route
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // 1. Health & System Diagnostic
 app.get('/health', (req, res) => {
   res.json({
