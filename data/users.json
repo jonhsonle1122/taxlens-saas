@@ -1,0 +1,33 @@
+{
+  "demo-free-key-guest": {
+    "apiKey": "demo-free-key-guest",
+    "name": "Khách hàng dùng thử",
+    "plan": "Trial",
+    "credits": 0,
+    "createdAt": "2026-10-06T03:13:55.267Z"
+  },
+  "taxlens_84w6o1mfdz_muw3u32n": {
+    "apiKey": "taxlens_84w6o1mfdz_muw3u32n",
+    "orderId": "TL601189",
+    "plan": "Gói Khởi Động (Starter)",
+    "credits": 50,
+    "totalPurchased": 50,
+    "activatedAt": "2026-10-06T03:14:00.335Z"
+  },
+  "taxlens_321ywn5rvi_muw3xiba": {
+    "apiKey": "taxlens_321ywn5rvi_muw3xiba",
+    "orderId": "TL478149",
+    "plan": "Gói Khởi Động (Starter)",
+    "credits": 50,
+    "totalPurchased": 50,
+    "activatedAt": "2026-10-06T03:16:40.054Z"
+  },
+  "taxlens_nf3l6zecpg_muw44qme": {
+    "apiKey": "taxlens_nf3l6zecpg_muw44qme",
+    "orderId": "TL387001",
+    "plan": "Gói Khởi Động (Starter)",
+    "credits": 50,
+    "totalPurchased": 50,
+    "activatedAt": "2026-10-06T03:22:17.414Z"
+  }
+}

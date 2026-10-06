@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaxLens AI - Trích Xuất Hóa Đơn VAT & Tra Cứu Mã Số Thuế Tự Hành</title>
+  <meta name="description" content="Micro-SaaS tự động trích xuất hóa đơn điện tử VAT chuẩn TT78, kiểm tra checksum mã số thuế 63 tỉnh thành, tích hợp thanh toán vi mô x402 Base L2 và VietQR Napas 24/7.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-bottom-right"></div>
+
+  <!-- Top Announcement Bar -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">TaxLens <span class="gradient-text">AI</span></span>
+          <span class="brand-badge">Micro-SaaS • Circular 78 & x402</span>
+        </div>
+      </div>
+
+      <div class="nav-metrics">
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span id="engineStatusText">Gemini 3.8 Flash • Online</span>
+        </div>
+        <div class="revenue-ticker">
+          <div class="ticker-item">
+            <span class="ticker-label">Doanh thu Base:</span>
+            <span class="ticker-val" id="headerUsdcBalance">0.0000 USDC</span>
+          </div>
+          <div class="ticker-divider"></div>
+          <div class="ticker-item">
+            <span class="ticker-label">VietQR:</span>
+            <span class="ticker-val vnd-color" id="headerVndBalance">0 ₫</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero & Navigation Tabs -->
+  <main class="main-content">
+    <section class="hero-section">
+      <div class="hero-badge">Autonomous Commerce Engine v1.0</div>
+      <h1 class="hero-title">Bóc Tách Hóa Đơn Điện Tử VAT & <br><span class="gradient-text">Kiểm Định Mã Số Thuế Tự Động</span></h1>
+      <p class="hero-subtitle">Giải pháp Micro-API & SaaS cho Kế toán viên, Indie Developers và Autonomous AI Agents. Tự động kiểm tra thuật toán Checksum Tổng Cục Thuế, đối soát lệch tiền, xuất file MISA ERP và thanh toán tức thì qua VietQR / x402 Base Network.</p>
+    </section>
+
+    <!-- Navigation Tabs Switcher -->
+    <div class="tab-navigation">
+      <button class="tab-btn active" data-tab="invoice-tab" id="tabInvoiceBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Bóc Tách Hóa Đơn
+      </button>
+      <button class="tab-btn" data-tab="taxcode-tab" id="tabTaxCodeBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        Kiểm Tra Checksum MST
+      </button>
+      <button class="tab-btn" data-tab="pricing-tab" id="tabPricingBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Bảng Giá & VietQR
+      </button>
+      <button class="tab-btn" data-tab="x402-tab" id="tabX402Btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        Giao Thức Bot x402 (Base)
+      </button>
+      <button class="tab-btn" data-tab="admin-tab" id="tabAdminBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Admin & Rút Doanh Thu
+      </button>
+    </div>
+
+    <!-- TAB 1: BÓC TÁCH HÓA ĐƠN -->
+    <section class="tab-content active" id="invoice-tab">
+      <!-- Fast sample selector -->
+      <div class="sample-bar">
+        <span class="sample-label">⚡ Chọn mẫu test 1-click:</span>
+        <button class="sample-chip" data-sample="fpt_retail" id="sampleFptBtn">💻 Hóa đơn Laptop FPT Retail (VAT 10%)</button>
+        <button class="sample-chip" data-sample="viettel_telecom" id="sampleViettelBtn">☁️ Thuê Cloud VPS Viettel (VAT 8%)</button>
+        <button class="sample-chip" data-sample="grab_mobility" id="sampleGrabBtn">🚗 GrabCar Doanh Nghiệp (VAT 10%)</button>
+      </div>
+
+      <div class="workspace-grid">
+        <!-- Left Column: Input and Auth -->
+        <div class="panel-card input-panel">
+          <div class="panel-header">
+            <h3>Dữ Liệu Hóa Đơn Điện Tử</h3>
+            <span class="badge badge-info">Thông tư 78/2021/TT-BTC</span>
+          </div>
+
+          <div class="auth-bar">
+            <div class="form-group">
+              <label for="apiKeyInput">Khóa API Key (Được tặng 3 lượt free):</label>
+              <div class="input-with-button">
+                <input type="text" id="apiKeyInput" value="demo-free-key-guest" placeholder="Nhập API Key hoặc để mặc định dùng thử">
+                <button class="btn btn-secondary btn-sm" id="checkCreditsBtn">Kiểm tra lượt</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="invoiceRawText">Nội dung Hóa Đơn (Dán text, XML hoặc chọn mẫu phía trên):</label>
+            <textarea id="invoiceRawText" rows="12" placeholder="Dán nội dung hóa đơn điện tử vào đây..."></textarea>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="btnExtractInvoice">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Bóc Tách & Đối Soát Ngay
+            </button>
+            <button class="btn btn-secondary" id="btnClearInvoice">Xóa Trắng</button>
+          </div>
+
+          <div class="user-credits-banner" id="userCreditsBanner">
+            <span>Số lượt khả dụng: <strong id="creditsCountDisplay">3 lượt</strong></span>
+            <a href="#pricing" class="link-glow" id="linkBuyMoreCredits">Nạp thêm qua VietQR →</a>
+          </div>
+        </div>
+
+        <!-- Right Column: Visual Result Card -->
+        <div class="panel-card output-panel">
+          <div class="panel-header">
+            <h3>Kết Quả Kiểm Định & Bóc Tách</h3>
+            <div class="header-actions">
+              <button class="btn btn-outline btn-xs" id="btnCopyJson">Sao chép JSON</button>
+              <button class="btn btn-outline btn-xs" id="btnExportMisa">Xuất ERP MISA</button>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" id="invoiceEmptyState">
+            <div class="empty-icon">🧾</div>
+            <h4>Chưa có hóa đơn nào được bóc tách</h4>
+            <p>Chọn một hóa đơn mẫu ở trên hoặc dán nội dung rồi nhấn "Bóc Tách & Đối Soát Ngay".</p>
+          </div>
+
+          <!-- Parsed Visual Result -->
+          <div class="invoice-result-wrapper hidden" id="invoiceResultWrapper">
+            <!-- Audit Banner -->
+            <div class="audit-banner" id="auditBanner">
+              <div class="audit-icon" id="auditIcon">🛡️</div>
+              <div class="audit-info">
+                <h4 id="auditTitle">Hóa Đơn Toàn Vẹn & Khớp Số Học 100%</h4>
+                <p id="auditDesc">Tổng tiền trước thuế và tiền thuế GTGT hoàn toàn khớp với tổng cộng thanh toán. Mã số thuế 2 bên đã được xác thực.</p>
+              </div>
+              <div class="audit-risk-tag" id="auditRiskTag">CLEAN</div>
+            </div>
+
+            <!-- Invoice Header Metadata -->
+            <div class="invoice-meta-grid">
+              <div class="meta-box">
+                <span class="meta-label">Ký hiệu (Serial)</span>
+                <span class="meta-value font-mono" id="resSerial">1C24TFR</span>
+              </div>
+              <div class="meta-box">
+                <span class="meta-label">Số Hóa Đơn</span>
+                <span class="meta-value font-mono" id="resInvoiceNo">0048291</span>
+              </div>
+              <div class="meta-box">
+                <span class="meta-label">Ngày Lập</span>
+                <span class="meta-value font-mono" id="resInvoiceDate">15/09/2026</span>
+              </div>
+            </div>
+
+            <!-- Entities (Seller & Buyer) -->
+            <div class="entities-grid">
+              <div class="entity-card seller-card">
+                <div class="entity-type">ĐƠN VỊ BÁN HÀNG</div>
+                <div class="entity-name" id="resSellerName">CÔNG TY CỔ PHẦN BÁN LẺ KỸ THUẬT SỐ FPT</div>
+                <div class="entity-tax">
+                  MST: <span class="font-mono" id="resSellerTax">0101248141</span>
+                  <span class="tax-status-badge valid" id="resSellerStatusBadge">✓ Hợp lệ</span>
+                </div>
+                <div class="entity-addr" id="resSellerAddr">261-263 Khánh Hội, Phường 2, Quận 4, TP.HCM</div>
+              </div>
+
+              <div class="entity-card buyer-card">
+                <div class="entity-type">ĐƠN VỊ MUA HÀNG</div>
+                <div class="entity-name" id="resBuyerName">CÔNG TY TNHH CÔNG NGHỆ ALPHA AI</div>
+                <div class="entity-tax">
+                  MST: <span class="font-mono" id="resBuyerTax">0303490096</span>
+                  <span class="tax-status-badge valid" id="resBuyerStatusBadge">✓ Hợp lệ</span>
+                </div>
+                <div class="entity-addr" id="resBuyerAddr">TechHub, Quận 1, TP.HCM</div>
+              </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <div class="table-container">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên Hàng Hóa / Dịch Vụ</th>
+                    <th>ĐVT</th>
+                    <th>SL</th>
+                    <th>Đơn Giá</th>
+                    <th>Thành Tiền</th>
+                    <th>Thuế</th>
+                  </tr>
+                </thead>
+                <tbody id="invoiceItemsTbody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Financial Total Calculation -->
+            <div class="financial-summary">
+              <div class="fin-row">
+                <span>Cộng tiền hàng (Subtotal):</span>
+                <strong class="font-mono" id="resSubtotal">43.500.000 ₫</strong>
+              </div>
+              <div class="fin-row">
+                <span>Tiền thuế GTGT (VAT):</span>
+                <strong class="font-mono vat-accent" id="resVatAmount">4.350.000 ₫</strong>
+              </div>
+              <div class="fin-row grand-total">
+                <span>Tổng cộng thanh toán:</span>
+                <strong class="font-mono total-accent" id="resTotalPayment">47.850.000 ₫</strong>
+              </div>
+              <div class="in-words-row">
+                <span>Bằng chữ:</span>
+                <em id="resInWords">Bốn mươi bảy triệu tám trăm năm mươi nghìn đồng chẵn.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: KIỂM TRA MÃ SỐ THUẾ & CHECKSUM -->
+    <section class="tab-content" id="taxcode-tab">
+      <div class="tax-validator-container">
+        <div class="tax-hero">
+          <h2>Thuật Toán Kiểm Định Checksum Mã Số Thuế 63 Tỉnh Thành</h2>
+          <p>Kiểm tra độ dài (10 hoặc 13 số), giải mã mã tỉnh thành đăng ký và đối soát công thức trọng số Modulo 11 chuẩn Tổng Cục Thuế Việt Nam.</p>
+        </div>
+
+        <div class="tax-input-wrapper">
+          <div class="tax-input-box">
+            <input type="text" id="taxCodeSearchInput" placeholder="Nhập mã số thuế 10 số hoặc 13 số (Ví dụ: 0303490096)..." value="0303490096">
+            <button class="btn btn-primary" id="btnValidateTaxCode">Tra Cứu & Xác Minh</button>
+          </div>
+          <div class="quick-tax-chips">
+            <span>Thử nhanh:</span>
+            <button class="tax-chip" data-mst="0303490096">0303490096 (VNG Corp)</button>
+            <button class="tax-chip" data-mst="0101248141">0101248141 (FPT Corp)</button>
+            <button class="tax-chip" data-mst="0100109106">0100109106 (Viettel Group)</button>
+            <button class="tax-chip" data-mst="0312653665">0312653665 (Thế Giới Di Động)</button>
+            <button class="tax-chip invalid-chip" data-mst="0301446099">0301446099 (Sai Checksum)</button>
+          </div>
+        </div>
+
+        <!-- Tax validation result -->
+        <div class="tax-result-card" id="taxResultCard">
+          <div class="tax-result-header">
+            <div class="tax-code-display font-mono" id="taxDisplayCode">0303490096</div>
+            <div class="tax-verdict-badge valid" id="taxVerdictBadge">✓ HỢP LỆ THEO CHUẨN TCT</div>
+          </div>
+
+          <div class="tax-detail-grid">
+            <div class="tax-cell">
+              <span class="cell-label">Tên Doanh Nghiệp / Tổ Chức</span>
+              <strong class="cell-value" id="taxEnterpriseName">CÔNG TY CỔ PHẦN VNG</strong>
+            </div>
+            <div class="tax-cell">
+              <span class="cell-label">Địa Bàn Đăng Ký (2 số đầu)</span>
+              <strong class="cell-value" id="taxProvinceDisplay">Mã 03 - TP. Hồ Chí Minh</strong>
+            </div>
+            <div class="tax-cell">
+              <span class="cell-label">Phân Loại Cấu Trúc</span>
+              <strong class="cell-value" id="taxTypeDisplay">Doanh nghiệp / Tổ chức kinh tế độc lập (10 số)</strong>
+            </div>
+            <div class="tax-cell">
+              <span class="cell-label">Cơ Quan Quản Lý Thuế</span>
+              <strong class="cell-value" id="taxAuthorityDisplay">Cục Thuế TP. Hồ Chí Minh</strong>
+            </div>
+          </div>
+
+          <!-- Formula explainer card -->
+          <div class="formula-box">
+            <h4>📐 Cơ Chế Tính Checksum Modulo 11:</h4>
+            <p class="font-mono formula-code">S = (d₁×31 + d₂×29 + d₃×23 + d₄×19 + d₅×17 + d₆×13 + d₇×7 + d₈×5 + d₉×3) mod 11<br>d₁₀ (Số kiểm tra) = 10 - S</p>
+            <p class="formula-status" id="taxChecksumStatusText">Chữ số kiểm tra tính toán hoàn toàn trùng khớp với chữ số cuối cùng của MST.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: BẢNG GIÁ & VIETQR -->
+    <section class="tab-content" id="pricing-tab">
+      <div class="pricing-header">
+        <h2>Gói Dịch Vụ & Cổng Thanh Toán VietQR</h2>
+        <p>Thanh toán chuyển khoản tức thì qua Napas 24/7 với mã QR tự động. Nhận API Key và số lượt quét ngay lập tức.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Starter Plan -->
+        <div class="pricing-card">
+          <div class="plan-tag">Indie & Khởi Nghiệp</div>
+          <h3 class="plan-name">Gói Starter</h3>
+          <div class="plan-price">
+            <span class="price-val">29.000</span>
+            <span class="price-unit">₫</span>
+          </div>
+          <div class="plan-credits">50 Lượt Bóc Tách Hóa Đơn</div>
+          <ul class="plan-features">
+            <li>✓ 50 lượt gọi trích xuất HĐ</li>
+            <li>✓ Kiểm tra checksum MST 63 tỉnh</li>
+            <li>✓ Xuất file kế toán MISA SME</li>
+            <li>✓ Hỗ trợ định dạng TT78</li>
+          </ul>
+          <button class="btn btn-primary btn-block btn-buy-plan" data-plan="starter" id="btnBuyStarter">
+            Quét VietQR 29.000 ₫
+          </button>
+        </div>
+
+        <!-- Pro Plan (Featured) -->
+        <div class="pricing-card featured">
+          <div class="featured-badge">Bán Chạy Nhất</div>
+          <div class="plan-tag">Kế Toán & Doanh Nghiệp Vừa</div>
+          <h3 class="plan-name">Gói Pro Accountant</h3>
+          <div class="plan-price">
+            <span class="price-val">99.000</span>
+            <span class="price-unit">₫</span>
+          </div>
+          <div class="plan-credits">300 Lượt Bóc Tách Hóa Đơn</div>
+          <ul class="plan-features">
+            <li>✓ 300 lượt gọi trích xuất HĐ</li>
+            <li>✓ Cấp API Key tích hợp phần mềm</li>
+            <li>✓ Tự động đối soát lệch tiền VAT</li>
+            <li>✓ Tốc độ ưu tiên < 500ms</li>
+            <li>✓ Không giới hạn thời hạn sử dụng</li>
+          </ul>
+          <button class="btn btn-emerald btn-block btn-buy-plan" data-plan="pro" id="btnBuyPro">
+            Quét VietQR 99.000 ₫
+          </button>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="pricing-card">
+          <div class="plan-tag">Swarm & Fleet</div>
+          <h3 class="plan-name">Gói Enterprise</h3>
+          <div class="plan-price">
+            <span class="price-val">299.000</span>
+            <span class="price-unit">₫</span>
+          </div>
+          <div class="plan-credits">1,500 Lượt Bóc Tách Hóa Đơn</div>
+          <ul class="plan-features">
+            <li>✓ 1,500 lượt gọi trích xuất HĐ</li>
+            <li>✓ Không giới hạn throughput</li>
+            <li>✓ Tự động gửi Webhook kết quả</li>
+            <li>✓ Hỗ trợ kết nối ERP riêng</li>
+            <li>✓ Support kỹ thuật 24/7</li>
+          </ul>
+          <button class="btn btn-primary btn-block btn-buy-plan" data-plan="enterprise" id="btnBuyEnterprise">
+            Quét VietQR 299.000 ₫
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: GIAO THỨC BOT X402 (BASE NETWORK) -->
+    <section class="tab-content" id="x402-tab">
+      <div class="x402-container">
+        <div class="x402-header">
+          <div class="badge badge-purple">Agent-to-Agent Commerce</div>
+          <h2>Giao Thức Thanh Toán Vi Mô x402 Trên Base L2</h2>
+          <p>Các AI Bot và Autonomous Agent có thể tự động gọi API và thanh toán theo từng lượt với chi phí chỉ <strong>0.005 USDC/request</strong> mà không cần đăng ký tài khoản hay thẻ tín dụng.</p>
+        </div>
+
+        <div class="x402-interactive-box">
+          <div class="box-header">
+            <h3>Trình Mô Phỏng Tương Tác x402 Handshake</h3>
+            <span class="font-mono text-sm text-dim">Base Network (Chain ID: 8453)</span>
+          </div>
+          <div class="box-body">
+            <div class="step-guide">
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <span>Bot gửi HTTP Request không kèm Key. Server phản hồi <code>HTTP 402 Payment Required</code> kèm địa chỉ ví nhận.</span>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <span>Bot chuyển 0.005 USDC trên mạng Base và gửi lại request với header <code>X-Payment-Proof: &lt;TX_HASH&gt;</code>.</span>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="btn btn-secondary" id="btnSimulate402">1. Gửi Gọi Thử (Nhận lỗi 402)</button>
+              <button class="btn btn-primary" id="btnSimulatePaymentProof">2. Gửi Kèm TX Proof (Mở khóa 200 OK)</button>
+            </div>
+
+            <div class="code-terminal">
+              <div class="terminal-bar">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span class="terminal-title">x402_handshake_response.json</span>
+              </div>
+              <pre class="terminal-code font-mono" id="x402TerminalOutput">// Nhấn các nút trên để xem mô phỏng handshake giữa Autonomous Agents...</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h3>Tài Liệu Tích Hợp Cho AI Agents (cURL & Python)</h3>
+          <div class="code-terminal">
+            <pre class="terminal-code font-mono">
+# 1. Gọi API với x402 Payment Proof
+curl -X POST http://localhost:3001/api/v1/extract-invoice \
+  -H "Content-Type: application/json" \
+  -H "X-Payment-Proof: 0x8f23...a7b4" \
+  -d '{"sampleId": "fpt_retail"}'
+
+# 2. Đăng ký & Khám phá Agent qua ERC-8004 Manifest
+curl http://localhost:3001/.well-known/erc-8004.json
+            </pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ADMIN & RÚT DOANH THU -->
+    <section class="tab-content" id="admin-tab">
+      <div class="admin-container">
+        <div class="admin-header">
+          <h2>Quản Lý Doanh Thu & Thu Tiền Về Ví (Settlement)</h2>
+          <p>Theo dõi tổng số dư kiếm được từ các giao dịch VietQR và thanh toán vi mô x402 Base L2, thực hiện lệnh rút tiền về ví cá nhân.</p>
+        </div>
+
+        <div class="stats-overview-grid">
+          <div class="stat-card">
+            <span class="stat-title">Số Dư USDC Khả Dụng (Base L2)</span>
+            <div class="stat-number font-mono text-cyan" id="adminUsdcBalance">0.0000 USDC</div>
+            <span class="stat-sub" id="adminUsdcAddress">Ví Agent: 0x4545...590e</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-title">Doanh Thu VietQR Đã Thu (VND)</span>
+            <div class="stat-number font-mono text-emerald" id="adminVndBalance">0 ₫</div>
+            <span class="stat-sub">Tài khoản Napas 24/7 MBBank</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-title">Tổng Lượt Gọi API Phục Vụ</span>
+            <div class="stat-number font-mono text-purple" id="adminTotalRequests">0 lượt</div>
+            <span class="stat-sub" id="adminPaidRequests">0 x402 • 0 VietQR</span>
+          </div>
+        </div>
+
+        <!-- Withdrawal Form Card -->
+        <div class="panel-card withdraw-panel">
+          <div class="panel-header">
+            <h3>Lệnh Rút Doanh Thu Về Ví Cá Nhân</h3>
+            <span class="badge badge-success">Zero Fee</span>
+          </div>
+          <div class="withdraw-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="withdrawTargetAddress">Địa chỉ ví nhận tiền trên mạng Base (0x...):</label>
+                <input type="text" id="withdrawTargetAddress" placeholder="0xYourPersonalBaseWalletAddress..." value="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">
+              </div>
+              <div class="form-group">
+                <label for="withdrawAmount">Số tiền rút (USDC):</label>
+                <input type="number" step="0.001" id="withdrawAmount" placeholder="0.05" value="0.01">
+              </div>
+              <div class="form-group">
+                <label for="withdrawAdminKey">Mã bí mật Admin (Security Key):</label>
+                <input type="password" id="withdrawAdminKey" placeholder="taxlens-admin-sec-2026" value="taxlens-admin-sec-2026">
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btnExecuteWithdraw">Xác Nhận Rút USDC Về Ví</button>
+            <div class="withdraw-feedback hidden" id="withdrawFeedback"></div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Log -->
+        <div class="panel-card transactions-panel">
+          <div class="panel-header">
+            <h3>Lịch Sử Giao Dịch & Dòng Tiền Gần Đây</h3>
+            <button class="btn btn-outline btn-xs" id="btnRefreshTx">Làm mới</button>
+          </div>
+          <div class="table-container">
+            <table class="items-table" id="transactionsTable">
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Loại</th>
+                  <th>Số tiền</th>
+                  <th>Cổng thanh toán</th>
+                  <th>Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsTbody">
+                <tr><td colspan="5" class="text-center">Đang tải lịch sử giao dịch...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- VIETQR PAYMENT MODAL -->
+  <div class="modal-backdrop hidden" id="vietQrModal">
+    <div class="modal-card">
+      <button class="modal-close" id="btnModalClose">&times;</button>
+      <div class="modal-header">
+        <h3 id="modalPlanTitle">Thanh Toán Gói Khởi Động</h3>
+        <p>Quét mã VietQR qua bất kỳ App ngân hàng nào (MB, VCB, Techcombank, VPBank, MoMo...)</p>
+      </div>
+      <div class="modal-body">
+        <div class="qr-image-wrapper">
+          <img id="modalQrImage" src="" alt="Mã VietQR Thanh Toán">
+          <div class="qr-loading-spinner" id="qrSpinner">Đang sinh mã QR...</div>
+        </div>
+        <div class="qr-details-box">
+          <div class="detail-row">
+            <span>Ngân hàng:</span>
+            <strong id="modalBankName">MB Bank (Quân Đội)</strong>
+          </div>
+          <div class="detail-row">
+            <span>Số tài khoản:</span>
+            <strong class="font-mono" id="modalAccountNo">0988776655</strong>
+          </div>
+          <div class="detail-row">
+            <span>Số tiền:</span>
+            <strong class="font-mono text-emerald" id="modalAmount">29.000 VNĐ</strong>
+          </div>
+          <div class="detail-row">
+            <span>Nội dung chuyển khoản (bắt buộc):</span>
+            <strong class="font-mono memo-highlight" id="modalMemo">TL123456</strong>
+          </div>
+        </div>
+        <div class="simulate-bar">
+          <p class="text-sm text-dim">⚡ Dành cho kiểm thử / demo:</p>
+          <button class="btn btn-emerald btn-block" id="btnSimulatePaid">Mô Phỏng Chuyển Khoản Thành Công (Instant Activate)</button>
+        </div>
+        <div class="paid-success-box hidden" id="paidSuccessBox">
+          <div class="success-icon">🎉</div>
+          <h4>Thanh Toán Thành Công!</h4>
+          <p>API Key đã được kích hoạt và nạp lượt vào tài khoản của bạn:</p>
+          <div class="api-key-box font-mono" id="newApiKeyDisplay">taxlens_key_sample</div>
+          <button class="btn btn-primary btn-block" id="btnUseNewApiKey">Tự Động Điền & Bắt Đầu Sử Dụng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
